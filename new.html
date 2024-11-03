@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animated Tic Tac Toe</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #74ebd5 0%, #9face6 100%);
+            transition: background-color 0.5s, color 0.5s;
+        }
+
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            padding: 20px;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .mode-switch {
+            margin-bottom: 10px;
+        }
+
+        .game-mode {
+            margin-bottom: 20px;
+        }
+
+        .scoreboard {
+            margin-bottom: 20px;
+            font-size: 20px;
+            color: #333;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 10px;
+            margin: 20px auto;
+        }
+
+        .square {
+            width: 100px;
+            height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 48px;
+            background-color: #ffffff;
+            border: 2px solid #333;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            border-radius: 10px;
+        }
+
+        .square:hover {
+            background-color: #ffcc00;
+            transform: scale(1.1);
+        }
+
+        .status {
+            margin: 10px 0;
+            font-size: 24px;
+            color: #333;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 18px;
+            cursor: pointer;
+            margin-top: 10px;
+            border: none;
+            background-color: #28a745;
+            color: white;
+            border-radius: 5px;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        button:hover {
+            background-color: #218838;
+            transform: translateY(-2px);
+        }
+
+        .congratulation {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(255, 255, 255, 0.9);
+            border: 2px solid #333;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            z-index: 10;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        .congratulation img {
+            width: 150px;
+            height: auto;
+            margin-top: 20px;
+        }
+
+        .congratulation p {
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 10px;
+            color: #28a745;
+        }
+
+        /* Draw Message Styles */
+        .draw-message {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(255, 255, 255, 0.9);
+            border: 2px solid #333;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            z-index: 10;
+        }
+
+        .draw-message img {
+            width: 150px;
+            height: auto;
+            margin-top: 20px;
+        }
+
+        /* Dark Mode Styles */
+        body.dark-mode {
+            background: linear-gradient(135deg, #1c1c1c 0%, #2e2e2e 100%);
+            color: #fff;
+        }
+
+        body.dark-mode .container {
+            background: rgba(50, 50, 50, 0.9);
+            color: #fff;
+        }
+
+        body.dark-mode .square {
+            background-color: #444;
+            border: 2px solid #fff;
+            color: #fff;
+        }
+
+        body.dark-mode .square:hover {
+            background-color: #ffcc00;
+        }
+
+        body.dark-mode button {
+            background-color: #007bff;
+        }
+
+        body.dark-mode button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Tic Rahul Toe</h1>
+        <div class="mode-switch">
+            <button id="toggle-mode">Switch to Dark Mode</button>
+        </div>
+        <div class="game-mode">
+            <button id="play-with-friends">Play with Friends</button>
+            <button id="play-with-computer">Play with Computer</button>
+        </div>
+        <div class="scoreboard">
+            <h2>Score</h2>
+            <p>X Wins: <span id="x-score">0</span></p>
+            <p>O Wins: <span id="o-score">0</span></p>
+        </div>
+        <div class="board" id="board"></div>
+        <div class="status" id="status"></div>
+        <button id="reset">Reset</button>
+        <div class="congratulation" id="congratulation">
+            <img id="win-image" src="" alt="Winner" />
+            <p id="win-text"></p>
+        </div>
+        <div class="draw-message" id="draw-message">
+            <img id="draw-image" src="https://media.tenor.com/0bv3A7v7lDcAAAAi/music-banana.gif" alt="Draw" />
+            <p>Game ended in a draw!</p>
+        </div>
+    </div>
+    <script>
+        const board = document.getElementById('board');
+        const statusDisplay = document.getElementById('status');
+        const resetButton = document.getElementById('reset');
+        const modeSwitchButton = document.getElementById('toggle-mode');
+        const playWithFriendsButton = document.getElementById('play-with-friends');
+        const playWithComputerButton = document.getElementById('play-with-computer');
+        const congratulationDisplay = document.getElementById('congratulation');
+        const winImage = document.getElementById('win-image');
+        const winText = document.getElementById('win-text');
+        const drawMessage = document.getElementById('draw-message');
+        const drawImage = document.getElementById('draw-image');
+
+        let currentPlayer = 'X';
+        let boardState = ['', '', '', '', '', '', '', '', ''];
+        let gameActive = true;
+        let playingWithComputer = false;
+        let xScore = 0;
+        let oScore = 0;
+
+        const winningConditions = [
+            [0, 1, 2],
+            [3, 4, 5],
+            [6, 7, 8],
+            [0, 3, 6],
+            [1, 4, 7],
+            [2, 5, 8],
+            [0, 4, 8],
+            [2, 4, 6],
+        ];
+
+        function handleSquareClick(event) {
+            const clickedSquare = event.target;
+            const clickedSquareIndex = parseInt(clickedSquare.getAttribute('data-index'));
+
+            if (boardState[clickedSquareIndex] !== '' || !gameActive) {
+                return;
+            }
+
+            boardState[clickedSquareIndex] = currentPlayer;
+            clickedSquare.textContent = currentPlayer;
+            checkForWinner();
+
+            if (playingWithComputer && gameActive) {
+                currentPlayer = 'O'; // Switch to the computer's turn
+                computerPlay();
+            } else {
+                currentPlayer = currentPlayer === 'X' ? 'O' : 'X'; // Switch to the next player
+            }
+        }
+
+        function computerPlay() {
+            let emptySquares = boardState.map((value, index) => value === '' ? index : null).filter(value => value !== null);
+            const randomSquare = emptySquares[Math.floor(Math.random() * emptySquares.length)];
+            boardState[randomSquare] = currentPlayer;
+            document.querySelector(`.square[data-index='${randomSquare}']`).textContent = currentPlayer;
+            checkForWinner();
+            currentPlayer = 'X'; // Switch back to the first player
+        }
+
+        function checkForWinner() {
+            let roundWon = false;
+
+            for (let i = 0; i < winningConditions.length; i++) {
+                const [a, b, c] = winningConditions[i];
+                if (boardState[a] === '' || boardState[b] === '' || boardState[c] === '') {
+                    continue;
+                }
+                if (boardState[a] === boardState[b] && boardState[a] === boardState[c]) {
+                    roundWon = true;
+                    showWinner(boardState[a]);
+                    break;
+                }
+            }
+
+            if (!roundWon && !boardState.includes('')) {
+                showDrawMessage();
+            } else if (!roundWon) {
+                statusDisplay.textContent = `It's ${currentPlayer}'s turn`;
+            }
+        }
+
+        function showWinner(winner) {
+            gameActive = false;
+            statusDisplay.textContent = `Player ${winner} has won!`;
+            winImage.src = 'https://media.tenor.com/HkRnaabRp3sAAAAi/celebrate-celebration.gif';
+            winText.textContent = `Congratulations Player ${winner}!`;
+            congratulationDisplay.style.display = 'flex';
+
+            if (winner === 'X') {
+                xScore++;
+                document.getElementById('x-score').textContent = xScore;
+            } else {
+                oScore++;
+                document.getElementById('o-score').textContent = oScore;
+            }
+        }
+
+        function showDrawMessage() {
+            gameActive = false;
+            statusDisplay.textContent = 'Game ended in a draw!';
+            drawMessage.style.display = 'flex';
+        }
+
+        function handleReset() {
+            gameActive = true;
+            currentPlayer = 'X';
+            boardState = ['', '', '', '', '', '', '', '', ''];
+            statusDisplay.textContent = `It's ${currentPlayer}'s turn`;
+            document.querySelectorAll('.square').forEach(square => square.textContent = '');
+            congratulationDisplay.style.display = 'none';
+            drawMessage.style.display = 'none';
+        }
+
+        function toggleMode() {
+            document.body.classList.toggle('dark-mode');
+            modeSwitchButton.textContent = document.body.classList.contains('dark-mode') ? 'Switch to Light Mode' : 'Switch to Dark Mode';
+        }
+
+        function setGameMode(isComputer) {
+            playingWithComputer = isComputer;
+            handleReset(); // Reset the game when switching modes
+            statusDisplay.textContent = `It's ${currentPlayer}'s turn`;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            for (let i = 0; i < 9; i++) {
+                const square = document.createElement('div');
+                square.classList.add('square');
+                square.setAttribute('data-index', i);
+                square.addEventListener('click', handleSquareClick);
+                board.appendChild(square);
+            }
+
+            resetButton.addEventListener('click', handleReset);
+            modeSwitchButton.addEventListener('click', toggleMode);
+            playWithFriendsButton.addEventListener('click', () => setGameMode(false));
+            playWithComputerButton.addEventListener('click', () => setGameMode(true));
+            statusDisplay.textContent = `It's ${currentPlayer}'s turn`;
+        });
+    </script>
+</body>
+</html>
